@@ -131,44 +131,52 @@ int nodeId1, nodeId2;
 
 
 ////////////////////The seedGene which is not in the PPI network is connected to a dummy node so the coexpression can be calculated////////////
-bool foundSeed=false;
-char seedGeneName[geneNameLen];
-fscanf(fpSeed, "%s\n", seedGeneName);
-for (int count=0; count<numNodes; count++)
-{
-	if (strcmp(seedGeneName,listNodes[numNodes].nodeName)==0)
-	{
-		foundSeed=true;
-	} 
-}
-if (foundSeed==false)
-{
-	printf("SeedNotFound\n");
 
-	//listNodes[numNodes].nodeId=numNodes;
-	//strcpy(listNodes[numNodes].nodeName, "DUMMYGENE\n");
-	//listNodes[numNodes].degree=0;
-	//listNodes[numNodes].weightCases=0;
-	//listNodes[numNodes].weightControl=0;
-	//numNodes++;
-	listNodes[numNodes].nodeId=numNodes;
-	strcpy(listNodes[numNodes].nodeName, seedGeneName);	
-	listNodes[numNodes].degree=0;
-	listNodes[numNodes].weightCases=0;
-	listNodes[numNodes].weightControl=0;
-	listNodes[numNodes].neighbours=NULL;
-	numNodes++;
-	//nodeId1=numNodes-2;
-	//nodeId2=numNodes-1;
-		
-	/*listNodes[nodeId1].degree++;
-	listNodes[nodeId2].degree++;
-	listNodes[nodeId1].neighbours=(int *)realloc(listNodes[nodeId1].neighbours, listNodes[nodeId1].degree*sizeof(int));
-	listNodes[nodeId2].neighbours=(int *)realloc(listNodes[nodeId2].neighbours, listNodes[nodeId2].degree*sizeof(int));
-	listNodes[nodeId1].neighbours[listNodes[nodeId1].degree-1]=nodeId2;
-	listNodes[nodeId2].neighbours[listNodes[nodeId2].degree-1]=nodeId1;
-	*/
+bool foundSeed=false;
+char seedGeneName[geneNameLen];  // you need to make this an array that has enough entries to hold the number of seed genes, which is seed_count
+// fscanf(fpSeed, "%s\n", seedGeneName);  // read in multiple genes instead of just one seed gene
+
+while (fscanf(fpSeed, "%s\n", seedGeneName)!=EOF) {
+	
+	for (int count=0; count<numNodes; count++)
+	{
+		if (strcmp(seedGeneName,listNodes[numNodes].nodeName)==0)
+		{
+			foundSeed=true;
+		} 
+	}
+	if (foundSeed==false)
+	{
+		printf("SeedNotFound\n");
+
+		//listNodes[numNodes].nodeId=numNodes;
+		//strcpy(listNodes[numNodes].nodeName, "DUMMYGENE\n");
+		//listNodes[numNodes].degree=0;
+		//listNodes[numNodes].weightCases=0;
+		//listNodes[numNodes].weightControl=0;
+		//numNodes++;
+		listNodes[numNodes].nodeId=numNodes;
+		strcpy(listNodes[numNodes].nodeName, seedGeneName);	
+		listNodes[numNodes].degree=0;
+		listNodes[numNodes].weightCases=0;
+		listNodes[numNodes].weightControl=0;
+		listNodes[numNodes].neighbours=NULL;
+		numNodes++;
+		//nodeId1=numNodes-2;
+		//nodeId2=numNodes-1;
+			
+		/*listNodes[nodeId1].degree++;
+		listNodes[nodeId2].degree++;
+		listNodes[nodeId1].neighbours=(int *)realloc(listNodes[nodeId1].neighbours, listNodes[nodeId1].degree*sizeof(int));
+		listNodes[nodeId2].neighbours=(int *)realloc(listNodes[nodeId2].neighbours, listNodes[nodeId2].degree*sizeof(int));
+		listNodes[nodeId1].neighbours[listNodes[nodeId1].degree-1]=nodeId2;
+		listNodes[nodeId2].neighbours[listNodes[nodeId2].degree-1]=nodeId1;
+		*/
+	}
+	
 }
+
+
 //////////////////The seedGene additions to the dummpy Node///////////////////
 
 for (int count=0; count<numNodes; count++)
@@ -337,19 +345,19 @@ totalLengthGenes=0;
 
 
 
-float calculateGeneScore_Pvalue(float score, int gene1, int gene2)
+float calculateGeneScore_Pvalue(float score, int gene1, int gene2) // given the co-expression between the seed gene and the other gene, the seed gene ID, and the other gene ID number (index)
 {
 int count1;
 int highScore1=0, highScore2=0;
-for (count1=0; count1<numNodes; count1++)
+for (count1=0; count1<numNodes; count1++) // look through the PPI graph, 'some gene'
 {
-	if (coExpresionMatrix[count1][gene1]<score)		
+	if (coExpresionMatrix[count1][gene1]<score)	  // compare the co-expression of the seed gene & 'some gene' in PPI, is it smaller than seed & other gene? 	
 	{
-		highScore1++;	
+		highScore1++; // if so, then add 1 to the H1 score.
 	}
-	if (coExpresionMatrix[count1][gene2]<score)
+	if (coExpresionMatrix[count1][gene2]<score)  // compare the co-expression of 'some gene' and the other gene, is it smaller than seed & other gene?
 	{
-		highScore2++;
+		highScore2++; // if so, then add 1 to the H2 score.
 	}
 }	
 
@@ -359,7 +367,7 @@ return 1-((float)(highScore1*highScore2)/(float)(numNodes*numNodes));
 }
 
 
-int assignScoreToBothControlandCases(FILE *fpCases, FILE *fpControl, FILE *fpGeneLen, FILE *fpOutputGeneScore)
+int assignScoreToBothControlandCases(FILE *fpCases, FILE *fpControl, FILE *fpGeneLen, FILE *fpOutputGeneScore, avg_bool) // fpCases is the file containing seeds
 {
 char geneName[geneNameLen];
 int numTruncatingControl;
@@ -370,49 +378,84 @@ double len;
 double temp;
 srand(time(NULL));
 
-char geneNameTargets[100][50];// the name of the gene targets to clauclate the score based on coexpression network 
+// you could count the number of lines in the fpCases file, or you could put in some arbitrary number that is large
+
+
+char geneNameTargets[100][50];// the name of the gene targets to calculate the score based on coexpression network, assuming that there are at most 100 seed genes
 int geneNameTargetsId[100];
 int geneNameTargetsCount=0;
 
 
 
-while(fscanf(fpCases,"%s\n", geneNameTargets[geneNameTargetsCount])!=EOF)
+while(fscanf(fpCases,"%s\n", geneNameTargets[geneNameTargetsCount])!=EOF) // put each seed gene into a row within the array
 {
-	for (int count=0; count<numNodes; count++)
+	for (int count=0; count<numNodes; count++) // search through all the nodes in the PPI graph to find the seed gene
 	{
-		if( strcmp(geneNameTargets[geneNameTargetsCount], listNodes[count].nodeName)==0)
+		if( strcmp(geneNameTargets[geneNameTargetsCount], listNodes[count].nodeName)==0)  // if the seed gene and the PPI graph gene are the same, then
 		{
-			geneNameTargetsId[geneNameTargetsCount]=count;
+			geneNameTargetsId[geneNameTargetsCount]=count;  // set the ID of the seed gene equal to the position in the PPI graph
 		}
 	}
 
-	geneNameTargetsCount++;
+	geneNameTargetsCount++; // keep incrementing to travel down the character array containing the seed genes
 }
 
-for (int count=0; count<geneNameTargetsCount; count++)
+for (int count=0; count<geneNameTargetsCount; count++)  // for the number of seed genes,
 {
-	for (int count2=0; count2<numNodes; count2++)
+	for (int count2=0; count2<numNodes; count2++)  // look through the nodes in the PPI graph, 
 	{
-		if (geneNameTargetsId[count]==count2)
+		if (geneNameTargetsId[count]==count2)  // if the seed gene's ID number is the same as the PPI graph position, 
 		{
 			//listNodes[count2].weightCases++;
 			//listNodes[count2].weightCases=10;
-			listNodes[count2].weightCases=0;
-		}else
+			listNodes[count2].weightCases=0;  // set the cases weight in the PPI node to 0			
+			
+			
+		}else  // looking at a gene in the PPI graph that IS NOT a seed gene
 		{
-
-
-			listNodes[count2].weightCases=listNodes[count2].weightCases+calculateGeneScore_Pvalue(coExpresionMatrix[geneNameTargetsId[count]][count2], geneNameTargetsId[count], count2);
-			listNodes[count2].weightCases=-1*log10(listNodes[count2].weightCases);
+			// TODO getting the weight according to the current seed gene
+			listNodes[count2].potentialWeightCases = calculateGeneScore_Pvalue(coExpresionMatrix[geneNameTargetsId[count]][count2], geneNameTargetsId[count], count2);
+			
+			// TODO doing average
+			if (avg_bool == 1) {
+				listNodes[count2].weightCases = listNodes[count2].weightCases + listNodes[count2].potentialWeightCases;
+			}
+			// set the weight of the cases equal to the existing weight + some score based on: 
+			// the co-expression of the seed gene and the gene in the PPI graph you're looking at. Other two parameters are the seed gene the index of the other gene in the PPI graph
+			
+//			listNodes[count2].weightCases=-1*log10(listNodes[count2].weightCases);  // TODO this shouldn't be enabled when there are multiple seed genes 
+			// now set the weight of the cases equal to -log10 (weight of cases)
+			
 			//listNodes[count2].weightCases=listNodes[count2].weightCases+coExpresionMatrix[geneNameTargetsId[count]][count2];
 		
 			//coExpresionMatrix[coExpresionGeneHashTable[secondGeneCount].nodeId][coExpresionGeneHashTable[firstGeneCount].nodeId]=geneCoExpr;
+			
+			// TODO else doing max, you should compare the proposed weight to the previous weight, and if the proposed weight is larger, then take it
+			else {
+				if (listNodes[count2].potentialWeightCases > listNodes[count2].weightCases) {
+					listNodes[count2].weightCases = listNodes[count2].potentialWeightCases;
+				}
+				
+			}
+			
 		}
 	}
 }
 
-
-
+// TODO if you have multiple seed genes, simply set listNodes[position of seed gene].weightCases = 0 in the end, and divide 
+// listNodes[position of non-seed gene].weightCases by the number of seed genes used to get the average score across seed genes? 
+// first, scale the scores with the -log10 by looking through all the scores. If average enabled, first average, then scale. If average not enabled, then just scale
+for (int count3 = 0; count3 < numNodes; count3++) {
+	if (avg_bool == 1) { // do the average
+		listNodes[count3].weightCases = listNodes[count3].weightCases / float(geneNameTargetsCount);
+	}
+	// now scale the scores in weightCases
+	listNodes[count3].weightCases = -1 * log10(listNodes[count3].weightCases);
+}
+// now finally set the weight of the seed genes to 0
+for (int count4 = 0; count4 < geneNameTargetsCount; count4++) {
+	listNodes[count4].weightCases = 0;
+}
 
 
 
@@ -512,8 +555,9 @@ for (int count=0; count<numNodes; count++)
 }
 	
 fclose(fpOutputGeneScore);
-printf("%i\n", countTotal);
+printf("%i\n", countTotal);  // here is the end of assignScoreToBothControlandCases
 }
+
 
 int createCoExpresionGeneHash(FILE *fp)
 {

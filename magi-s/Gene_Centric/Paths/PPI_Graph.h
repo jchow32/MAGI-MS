@@ -26,7 +26,8 @@ typedef struct PPI_Node{
 	
 	double prob;
 
-	double weightCases;// The weight assigned for the cases I assume is double
+	double weightCases;// The weight assigned for the cases I assume is double 
+	double potentialWeightCases; // TODO if the user chooses max for multiple seeds, this is where to store the weight for a gene when you're checking if it's the maximum score or not 
 	int weightControl;//The weight assigned to control I assume is integer
 	int degree; //number of connections in the PPI network
 	double log_length;

@@ -428,6 +428,7 @@ int main(int argv, char *argc[])
 {
 	int randomRunId=0;
 	char fileName[100];
+	int avg_bool = 0; // TODO initialize the bool showing if you should do average or maximum score for multiple seeds
 	FILE *fp=fopen(argc[1],"r");//PPI Network
 	FILE *fp2=fopen(argc[2],"r");//The name of genes as center (such as FMR1)
 	FILE *fp3=fopen(argc[3],"r");//The control
@@ -438,6 +439,11 @@ int main(int argv, char *argc[])
 	randomRunId = atoi(argc[7]);
 	sprintf(fileName,"RandomGeneList.%i\0", randomRunId);
 	FILE *fp7=fopen(fileName,"w");
+	// TODO you should accept an argument from the user which specifies if will use the average or maximum score for multiple seeds
+	if (strcmp(argc[8], "-avg")==0)  // then do the average
+	{
+		avg_bool = 1;
+	}
 	//numColor=atoi(argc[7]);//
 	//controlServMutAllowed=atoi(argc[8]);
 	createPPI_Graph(fp2, fp);
@@ -448,7 +454,7 @@ int main(int argv, char *argc[])
 	printf("L448\n");
 	createCoExpresionMatix(fp6);
 	printf("L450\n");
-	assignScoreToBothControlandCases(fp2, fp3, fp4, fp7);
+	assignScoreToBothControlandCases(fp2, fp3, fp4, fp7, avg_bool);
 	//for (int countNumColor=8; countNumColor<9; countNumColor++)
 	printf("L453\n");
 	for (int countNumColor=5; countNumColor<9; countNumColor++)
