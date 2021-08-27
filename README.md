@@ -23,7 +23,7 @@ makefile -f makefile_Cluster
 ```
 
 The first executable (`magi-ms/Gene_Centric/Paths/Pathway_GeneCenter`) creates the seed pathways of size 5 to 8 genes. `Pathway_GeneCenter` produces 16 output files named in the format of `BestPaths.Length*.Control*.Run*`). <br>
-The second executable (`magi-ms/Gene_Centric/Clusters/Cluster2`) merges the seed pathways written by `Pathway_GeneCenter` into clusters to form modules.
+The second executable (`magi-ms/Gene_Centric/Clusters/Cluster`) merges the seed pathways written by `Pathway_GeneCenter` into clusters to form modules.
 
 ## *Pathway_GeneCenter*
 
@@ -39,7 +39,7 @@ The second executable (`magi-ms/Gene_Centric/Clusters/Cluster2`) merges the seed
 	$geneCoexpressionID <Gene CoExpression ID>
 		The input gives the order of each gene appearing in the coExpression table. File input format: <Gene_row_id><\t>OTHER_ID<\t><Gene_Name> (Example: GeneCoExpresion_ID)
 	$coexpressionMatrix <CoExpression Matrix>
-		Pairwise gene co-expression values. File input format:<Gene_Name_1><\t><Gene_Name_2><\t><CoExpression> (Example: adj1.csv.Tab.BinaryFormat)
+		Pairwise gene co-expression values. File input format:<Gene_Name_1><\t><Gene_Name_2><\t><CoExpression - r^6> (Example: adj1.csv.Tab.BinaryFormat)
 		Note: Genes pairs are sorted based on their <Gene_row_id> provided in $geneCoexpressionID. 
 	$ID <run id>
 		The id for this run (integer). This integer is used to seed a random number generator. 
@@ -50,6 +50,7 @@ The second executable (`magi-ms/Gene_Centric/Clusters/Cluster2`) merges the seed
 Output:
 1) `RandomGeneList.%i`: A text file listing genes with their assigned score. File output format: <Gene_Name> <Score> <0> <0> <Number_LOF_in_Controls> <0>
 2) `BestPaths.Length%i.Control%i.Run%i`: The seed pathways created, for different lengths (default is from 5 to 8) and total mutations in control (ranging from 0 to 4), with 1,000 iterations per combination of length and total mutations allowed in controls, resulting in a total of 16,000 seed pathways. A total of 16 files, each with 1,000 seed pathways, are created.
+	
 	
 Example downloadable input files: 
 * PPI network: [StringNew_HPRD](https://eichlerlab.gs.washington.edu/MAGI/Data/StringNew_HPRD)
@@ -75,41 +76,56 @@ adj1.csv.Tab.BinaryFormat \
 
 ## *Cluster*
 	Required Parameters
-
 	-p <PPI Network> $PPI
-		The input file should be a file of binary interactions. File input format:<Gene_Name_1><\t><Gene_Name_2> (Example: String_HPRD_PPI)
+		The input file should be a file of binary interactions. File input format:<Gene_Name_1><\t><Gene_Name_2> (Example: StringNew_HPRD)
 	-c <case/control mutation scores>
-		The input file is the RandomGeneList.%i file created in previous step
-	-h <Gene CoExpression Id> $geneCoexpressionID
- 		The input gives the order of each gene appearing in the coExpression table. FIle input format: <Gene_row_id><\t>OTHER_ID<\t><Gene_Name> (Example: GeneCoExpresion_ID)
+		The input file is the RandomGeneList.%i file created in previous step.
+	-h <Gene CoExpression ID> $geneCoexpressionID
+ 		The input gives the order of each gene appearing in the coExpression table. File input format: <Gene_row_id><\t>OTHER_ID<\t><Gene_Name> (Example: GeneCoExpresion_ID)
 	-e <CoExpression Matrix> $coexpressionMatrix
 		Pairwise gene coexpression values. File input format:<Gene_Name_1><\t><Gene_Name_2><\t><CoExpression - r^6> (example: adj1.csv.Tab.BinaryFormat)
-		Note that the genes pairs are sorted based on their <Gene_row_id> provided in the file inputed as -h parameters.
+		Note that the genes pairs are sorted based on their <Gene_row_id> provided in the file inputed as -h parameter.
 	-s <Seed File> 
-		The file names of different seeds. <Seed Name File><\t><Number of seeds><\t><Length of Seeds> (example: Paths. The Paths file references files (BestPaths.Length%i.Control%i.Run%i) created from running Pathway_GeneCenter in the previous step)
+		The file names of different seed pathways. <Seed Name File><\t><Number of seeds><\t><Length of Seeds> (example: Paths. The Paths file references files created from running Pathway_GeneCenter in the previous step)
 	-m <upper bound on control mutations>
-		The total number of mutations in control's allowed. 
+		The total number of mutations in controls allowed (recommended value: 6).
 	-l <lower bound on the size of the module>
-		The minimum number of genes in the module 
+		The minimum number of genes in the module.
 	-u <upper bound on the size of the module>
-		The maximum number of genes in the module
+		The maximum number of genes in the module.
 	-a <minimum ratio of seed score allowed>
-		For each seed type the ratio of the score from maximum score of the seed allowed (in the paper 0.5 was used)
+		For each seed type, the ratio of the score from the maximum score of the seed allowed (recommended value: 0.5)
 	-i <run id>  
-		The id for this run.
+		The id for this run (integer).
 
 	Optional Parameters
 	
-	-minCoExpr <minimum pair-wise coexpression value>
-		The minimum pair-wise coexpression value per gene allowed (the default is 0.01, i.e. r^2>0.01, which is the median coexpression value in the input adj1.csv.Tab.BinaryFormat)
-	-avgCoExpr <minimum average coexpression of the module>
-		The minimum average coexpression of the modules allowed (the default is 0.415)
+	-minCoExpr <minimum pair-wise co-expression value>
+		The minimum pair-wise co-expression value per gene allowed (the default is 0.01, i.e. r^2>0.01, which is the median co-expression value in the input adj1.csv.Tab.BinaryFormat)
+	-avgCoExpr <minimum average co-expression of the module>
+		The minimum average co-expression of the modules allowed (the default is 0.415, recommended range: 0.425-0.52)
 	-avgDensity <minimum density of PPI>
-		The minimum PPI density of the modules allowed (the default is 0.08)
+		The minimum PPI density of the modules allowed (the default is 0.08, recommended range 0.080-0.14)
 
-Example: 
-Gene_Centric/Clusters/Cluster2 -p $PPI -c ../RandomGeneList.1 -h $geneCoexpressionID -e $coexpressionMatrix -s Paths -m 6 -l 20 -u 100 -a 0.5 -i 1 -minCoExpr 0.01 -avgCoExpr 0.440000 -avgDensity 0.14 > CCluster_Len_20_MinCoExpr0.01_LessCoexpr_New_0.440000
+	
+Example downloadable input files:
+* Seed pathway file: [Paths](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/Paths)
 
-# Tips
-In practice, Cluster2 can be run multiple times on the same BestPaths* generated from a single run of Pathway_GeneCenter, and the highest scoring module can be retrieved from all runs of Cluster2. 
-36 example input parameters (a single combination of parameters per line) for Cluster2 are displayed in the file magi-s/Inputs, in which the parameters -l, -i, -avgCoExpr, and -avgDensity are varied. 36 example output names are also provided in the file magi-s/Outputs2, which correspond to the suggested input parameters listed in magi-s/Inputs. Note that the first line of magi-s/Inputs and magi-s/Outputs2 are substituted into the Example Cluster2 command shown above. 
+Example command: 
+```
+magi-ms/Gene_Centric/Clusters/Cluster \
+-p StringNew_HPRD \
+-c RandomGeneList.1 \
+-h GeneCoExpresion_ID \
+-e adj1.csv.Tab.BinaryFormat \
+-s Paths \
+-m 6 -l 20 -u 100 -a 0.5 \
+-i 1 \
+-minCoExpr 0.01 -avgCoExpr 0.440000 -avgDensity 0.14 > CCluster_Len_20_MinCoExpr0.01_LessCoexpr_New_0.440000
+```
+	
+## Tips
+* For any given output file generated by <i>Cluster</i> (for example, called `$output_file_name`), the highest scoring module can be retrieved by running the bash script [getOptimalModule.sh](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/getOptimalModule.sh): 
+	`./getOptimalModule.sh $output_file_name`
+* In practice, <i>Cluster</i> can be run multiple times on the same `BestPaths*` generated from a single run of <i>Pathway_GeneCenter</i>, and the highest scoring module can be retrieved from all runs of <i>Cluster</i>.
+* 36 example input parameters (a single combination of parameters per line) for <i>Cluster</i> are displayed in the [Inputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/Inputs) file, in which the parameters -l, -i, -avgCoExpr, and -avgDensity are varied. 36 example output names are also provided in the file [Outputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/Outputs2), which correspond to the suggested input parameters listed in [Inputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/Inputs). Note that the first line of [Inputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/Inputs) and [Outputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-s/Outputs2) are substituted into the example <i>Cluster</i> command shown above. 
