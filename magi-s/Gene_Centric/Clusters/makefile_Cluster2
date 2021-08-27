@@ -1,9 +1,0 @@
-CC=g++ -mcmodel=large 
-CFLAGS= -c -O3
-
-Cluster2: clustering.o PPI_Graph.o
-	$(CC) -O3 -o Cluster2 clustering.o PPI_Graph.o
-clustering.o: clustering.cpp clustering.h
-	$(CC) $(CFLAGS) clustering.cpp
-PPI_Graph.o: PPI_Graph.cpp PPI_Graph.h
-	$(CC) $(CFLAGS) PPI_Graph.cpp
