@@ -15,7 +15,7 @@ Seed pathways are created using high scoring genes, which are genes that are hig
 MAGI-MS produces a module specific to the interaction profile of the selected seed gene(s), thereby permitting the identification of modules specific to certain biological pathways relevant to the seed gene(s). Supplying MAGI-MS with a variety of candidate genes relevant to certain phenotypes can dissect comborbid phenotypes in complex disorders.
 
 # How to run MAGI-MS
-This package has two different makefiles (`magi-ms/Gene_Centric/Paths/makefile` and `magi-ms/Gene_Centric/Clusters/makefile_Cluster2`). The <i>Pathway_GeneCenter</i> and <i>Cluster2</i> programs have been compiled from these makefiles and are available for immediate use. <br>
+This package has two different makefiles (`magi-ms/Gene_Centric/Paths/makefile` and `magi-ms/Gene_Centric/Clusters/makefile_Cluster2`). The [Pathway_GeneCenter](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Gene_Centric/Paths/Pathway_GeneCenter) and [Cluster2](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Gene_Centric/Clusters/Cluster2) programs have been compiled from these makefiles and are available for immediate use. <br>
 
 The first executable (`magi-ms/Gene_Centric/Paths/Pathway_GeneCenter`) creates the seed pathways of size 5 to 8 genes. `Pathway_GeneCenter` produces 16 output files named in the format of `BestPaths.Length*.Control*.Run*`). <br>
 The second executable (`magi-ms/Gene_Centric/Clusters/Cluster2`) merges the seed pathways written by `Pathway_GeneCenter` into clusters to form modules.
