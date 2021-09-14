@@ -370,8 +370,8 @@ for (count1=0; count1<numNodes; count1++) // look through the PPI graph, 'some g
 	}
 }	
 
-//return ((float)(highScore1*highScore2)/(float)(numNodes*numNodes));
-return 1-((float)(highScore1*highScore2)/(float)(numNodes*numNodes));
+return ((float)(highScore1*highScore2)/(float)(numNodes*numNodes)); // 09/09 removed the 1 - 
+//return 1-((float)(highScore1*highScore2)/(float)(numNodes*numNodes));
 
 }
 
@@ -523,16 +523,19 @@ for (int count=0; count<geneNameTargetsCount; count++)  // for the number of see
 		listNodes[i].potentialWeightCases = (listNodes[i].potentialWeightCases - mean_weight) / (float)std_weight;  // for zScore
 //		listNodes[i].potentialWeightCases = (listNodes[i].potentialWeightCases - min_weight) / (float)diff_weight; // for minMax
 		if (listNodes[i].weightCases == 0) { // this means that this is the first pass
-			listNodes[i].weightCases = -1 * listNodes[i].potentialWeightCases;  // Now the z-scored scores are stored in .weightCases for each gene relative to the seed gene
+			listNodes[i].weightCases = listNodes[i].potentialWeightCases;  // Now the z-scored scores are stored in .weightCases for each gene relative to the seed gene
 			// what is happening with STXBP1 here
+			// 09/09 removed the -1 * 
 		}
 		else { // this means that you're considering the second and up seed gene z-scored weight
 			if (avg_bool == 1) { // you're doing the average, so you should just sum the z-scored scrores and then divide later by the number of seed genes
-				listNodes[i].weightCases += (-1 * listNodes[i].potentialWeightCases);
+				listNodes[i].weightCases += (listNodes[i].potentialWeightCases);
+				// 09/09 removed the -1 * 
 			}
 			else { // you're doing minimum, which means whatever you decide is the minimum for now should stay in .weightCases
-				if (-1 * listNodes[i].potentialWeightCases < listNodes[i].weightCases) {
-					listNodes[i].weightCases = -1 * listNodes[i].potentialWeightCases; // else just keep weightCases as is, because it's smaller than the one you're considering
+				if (listNodes[i].potentialWeightCases < listNodes[i].weightCases) { // 09/09 removed the -1 * 
+					listNodes[i].weightCases = listNodes[i].potentialWeightCases; // else just keep weightCases as is, because it's smaller than the one you're considering
+					// 09/09 removed the -1 * 
 				}
 			}
 			
