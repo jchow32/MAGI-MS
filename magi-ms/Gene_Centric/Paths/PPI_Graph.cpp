@@ -178,10 +178,10 @@ while (fscanf(fpSeed, "%s\n", seedGeneName[seed_count])!=EOF) {
 	}
 	
 	seed_count++; // TODO if seed_count > 3, then you should quit and print an error message that you need 1-3 seeds. 
-	if (seed_count > 3) {
-		printf("Please select 1 to 3 seed genes. Exiting\n");
-		exit(0);
-	}
+//	if (seed_count > 3) {
+//		printf("Please select 1 to 3 seed genes. Exiting\n");
+//		exit(0);
+//	}
 	
 }
 
