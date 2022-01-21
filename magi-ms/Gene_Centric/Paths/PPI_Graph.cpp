@@ -133,7 +133,7 @@ int nodeId1, nodeId2;
 ////////////////////The seedGene which is not in the PPI network is connected to a dummy node so the coexpression can be calculated////////////
 
 bool foundSeed=false;
-char seedGeneName[3][geneNameLen];  // you need to make this an array that has enough entries to hold the number of seed genes, which is 3
+char seedGeneName[100][geneNameLen];  // you need to make this an array that has enough entries to hold the number of seed genes, which could be 100
 int seed_count = 0;
 // fscanf(fpSeed, "%s\n", seedGeneName);  // read in multiple genes instead of just one seed gene
 
