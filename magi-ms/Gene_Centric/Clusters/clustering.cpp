@@ -434,7 +434,7 @@ float clusScore=0;
 int randomWalkInGraph(int nodeId, clustersSelected *cluster)
 {
 clustersSelected *tempClus;
-int potClusIdCanMergeToClus[50000];
+int potClusIdCanMergeToClus[10000];
 int potClusIdCanMergeToClusCount=0;
 int randomId;
 
@@ -961,6 +961,7 @@ int main(int argv, char *argc[])
 	printf("create Graphs Paths %i\n", totalClusters);
 	createGraphOfPaths();
 	printf("Start Ranodom comp con\n");
+	fflush(stdout);
 	if (totalClusters>0)
 		randomConnectedComponents(randomNum);
 }
