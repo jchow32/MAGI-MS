@@ -481,7 +481,16 @@ for (int count=0; count<geneNameTargetsCount; count++)  // for the number of see
 		else  // looking at a gene in the PPI graph that IS NOT a seed gene
 		{
 			// TODO getting the weight according to the current seed gene
-			listNodes[count2].potentialWeightCases = calculateGeneScore_Pvalue(coExpresionMatrix[geneNameTargetsId[count]][count2], geneNameTargetsId[count], count2);
+			if (avg_bool == 1) {
+				listNodes[count2].potentialWeightCases = calculateGeneScore_Pvalue(coExpresionMatrix[geneNameTargetsId[count]][count2], geneNameTargetsId[count], count2);
+			}
+			// To not have z-scoring enabled for -min: else do the typical scoring with -log10
+			else { 
+				listNodes[count2].potentialWeightCases = calculateGeneScore_Pvalue(coExpresionMatrix[geneNameTargetsId[count]][count2], geneNameTargetsId[count], count2);
+				listNodes[count2].potentialWeightCases = -1 * log10(1 - listNodes[count2].potentialWeightCases);
+				
+			}
+			// listNodes[count2].potentialWeightCases = log10(listNodes[count2].potentialWeightCases); // added
 			
 		}			
 		// start aggregating the potentialWeightCases to get the mean weight for this seed
@@ -520,7 +529,9 @@ for (int count=0; count<geneNameTargetsCount; count++)  // for the number of see
 	
 	// TODO now calculate the z-score using the mean and standard deviation 
 	for (int i=0; i<numNodes; i++) {
-		listNodes[i].potentialWeightCases = (listNodes[i].potentialWeightCases - mean_weight) / (float)std_weight;  // for zScore
+		if (avg_bool == 1) {
+			listNodes[i].potentialWeightCases = (listNodes[i].potentialWeightCases - mean_weight) / (float)std_weight; // zScore if doing avg
+		}
 //		listNodes[i].potentialWeightCases = (listNodes[i].potentialWeightCases - min_weight) / (float)diff_weight; // for minMax
 		if (listNodes[i].weightCases == 0) { // this means that this is the first pass
 			listNodes[i].weightCases = listNodes[i].potentialWeightCases;  // Now the z-scored scores are stored in .weightCases for each gene relative to the seed gene
