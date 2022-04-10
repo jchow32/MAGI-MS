@@ -6,9 +6,9 @@ Merging affected genes into integrate networks - multiple seeds (MAGI-MS) is an 
 
 A module is constructed by first assigning scores to every gene (<i>G</i>) in the PPI network according to their degree of co-expression with the seed gene(s) (**Equation 1**). For example, if two seed genes are provided, then a gene in the PPI network is associated with two scores; z-scoring is applied for scores calculated relative to a given seed gene. To assign a final gene score for each gene in the PPI network, the average (-avg) or minimum (-min) score is selected, such that a larger score indicates a greater degree of co-expression with the seed gene(s). <br>
 
-<p align="center"><img width="332" alt="Equation1" src="https://user-images.githubusercontent.com/7622394/131165256-b9485871-4a1b-42a0-a748-a9c93fbf6d0b.png"> <br> </p>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <i>H1</i>: number of pairwise comparisons of co-expression values for which co-expression of (seed gene & gene to be scored) &gt; (seed gene & and another gene in the PPI network) <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <i>H2</i>: number of pairwise comparisons of co-expression values for which co-expression of (seed gene & gene to be scored) &gt; (gene to be scored & another gene in the PPI network) <br>
+<p align="center"><i> G<sub>s,i</sub> = ((H<sub>1</sub>)(H<sub>2</sub>)) / N<sup>2</sup> </i><br> </p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <i>H<sub>1</sub></i>: number of pairwise comparisons of co-expression values for which co-expression of (seed gene & gene to be scored) &gt; (seed gene & and another gene in the PPI network) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <i>H<sub>2</sub></i>: number of pairwise comparisons of co-expression values for which co-expression of (seed gene & gene to be scored) &gt; (gene to be scored & another gene in the PPI network) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <i>N</i>: total number of genes within the PPI network <br> <br>
 
 Seed pathways are created using high scoring genes, which are genes that are highly connected in the supplied interaction networks to the input seed gene(s). Seed pathways are then merged via a random walk, and optimal modules are refined by local search (<b>Figure 1</b>). <br><br>
@@ -124,3 +124,4 @@ magi-ms/Gene_Centric/Clusters/Cluster2 \
 	`./getOptimalModule.sh $output_file_name`
 * In practice, <i>Cluster2</i> can be run multiple times on the same `BestPaths*` generated from a single run of <i>Pathway_GeneCenter</i>, and the highest scoring module can be retrieved from all runs of <i>Cluster2</i>.
 * 36 example input parameters (a single combination of parameters per line) for <i>Cluster2</i> are displayed in the [Inputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Inputs) file, in which the parameters -l, -i, -avgCoExpr, and -avgDensity are varied. 36 example output names are also provided in the file [Outputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Outputs2), which correspond to the suggested input parameters listed in [Inputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Inputs). Note that the first line of [Inputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Inputs) and [Outputs](https://github.com/jchow32/MAGI-MS/blob/main/magi-ms/Outputs2) are substituted into the example <i>Cluster2</i> command shown above. 
+
